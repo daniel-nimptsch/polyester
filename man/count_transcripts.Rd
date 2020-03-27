@@ -4,8 +4,12 @@
 \alias{count_transcripts}
 \title{determine how many transcripts are annotated in a FASTA or GTF file}
 \usage{
-count_transcripts(f, fasta = TRUE, identifier = "transcript_id",
-  attrsep = "; ")
+count_transcripts(
+  f,
+  fasta = TRUE,
+  identifier = "transcript_id",
+  attrsep = "; "
+)
 }
 \arguments{
 \item{f}{character, path to a file in FASTA or GTF format}
@@ -31,4 +35,3 @@ fastapath = system.file("extdata", "chr22.fa", package="polyester")
 count_transcripts(fastapath) #918
 
 }
-

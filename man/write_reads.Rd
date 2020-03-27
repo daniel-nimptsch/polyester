@@ -4,8 +4,16 @@
 \alias{write_reads}
 \title{write sequencing reads to disk}
 \usage{
-write_reads(reads, fname, readlen, paired = TRUE, gzip, offset = 1L,
-  shuffle = FALSE)
+write_reads(
+  reads,
+  fname,
+  readlen,
+  paired = TRUE,
+  gzip,
+  offset = 1L,
+  shuffle = FALSE,
+  fastq = TRUE
+)
 }
 \arguments{
 \item{reads}{DNAStringSet representing sequencing reads}
@@ -24,7 +32,7 @@ assumed to be single-end and just one file, \code{fname.fasta}, is written.}
 
 \item{gzip}{If \code{TRUE}, gzip the output fasta files.}
 
-\item{offset}{An integer number greater or equal to 1 to start assigning 
+\item{offset}{An integer number greater or equal to 1 to start assigning
 read numbers at.}
 
 \item{shuffle}{If \code{TRUE}, shuffles the reads before writing them to file.}
@@ -55,9 +63,9 @@ The \code{\link{get_reads}} function returns a DNAStringSet object
 
 ## If the file is too big, you can subset it and write it in chunks.
 ## Here we split our 'reads' into two chunks and save them to the same file.
-write_reads(srPhiX174[1:100], fname='./srPhiX174-offset', readlen=readlen, 
+write_reads(srPhiX174[1:100], fname='./srPhiX174-offset', readlen=readlen,
    paired=FALSE, gzip=FALSE, offset = 1L)
-write_reads(srPhiX174[101:length(srPhiX174)], fname='./srPhiX174-offset', 
+write_reads(srPhiX174[101:length(srPhiX174)], fname='./srPhiX174-offset',
    readlen=readlen, paired=FALSE, gzip=FALSE, offset = 101L)
 
 ## We can verify that we get the same results

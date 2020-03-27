@@ -1,25 +1,25 @@
 #' generate a set of fragments from a set of transcripts
 #'
 #' Convert each sequence in a DNAStringSet to a "fragment" (subsequence)
-#' @param tObj DNAStringSet of sequences from which fragments should be 
+#' @param tObj DNAStringSet of sequences from which fragments should be
 #'   extracted
-#' @param distr One of 'normal', 'empirical', or 'custom'. If 'normal', draw 
-#'   fragment lengths from a normal distribution with mean \code{fraglen} and 
-#'   standard deviation \code{fragsd}. If 'empirical', draw fragment lengths 
+#' @param distr One of 'normal', 'empirical', or 'custom'. If 'normal', draw
+#'   fragment lengths from a normal distribution with mean \code{fraglen} and
+#'   standard deviation \code{fragsd}. If 'empirical', draw fragment lengths
 #'   from a fragment length distribution estimated from a real data set. If
 #'   'custom', draw fragment lengths from a custom distribution, provided as
-#'   the \code{custdens} argument, which should be a density fitted using 
-#'   \code{\link{logspline}}. 
+#'   the \code{custdens} argument, which should be a density fitted using
+#'   \code{\link{logspline}}.
 #' @param fraglen Mean fragment length, if drawing fragment lengths from a
-#'   normal distribution. 
+#'   normal distribution.
 #' @param fragsd Standard deviation of fragment lengths, if drawing lengths
-#'   from a normal distribution. Note: \code{fraglen} and \code{fragsd} are 
+#'   from a normal distribution. Note: \code{fraglen} and \code{fragsd} are
 #'   ignored unless \code{distr} is 'normal'.
 #' @param readlen Read length. Default 100. Used only to label read positions.
 #' @param custdens If \code{distr} is 'custom', draw fragments from this
 #'   density. Should be an object of class \code{logspline}.
-#' @param bias One of 'none', 'rnaf', or 'cdnaf' (default 'none'). 'none' 
-#'   represents uniform fragment selection (every possible fragment in a 
+#' @param bias One of 'none', 'rnaf', or 'cdnaf' (default 'none'). 'none'
+#'   represents uniform fragment selection (every possible fragment in a
 #'   transcript has equal probability of being in the experiment); 'rnaf'
 #'   represents positional bias that arises in protocols using RNA
 #'   fragmentation, and 'cdnaf' represents positional bias arising in protocols
@@ -30,20 +30,20 @@
 #'   of Li and Jiang (2012).
 #' @param frag_GC_bias See explanation in \code{\link{simulate_experiment}}.
 #' @export
-#' @return DNAStringSet consisting of one randomly selected subsequence per 
+#' @return DNAStringSet consisting of one randomly selected subsequence per
 #'   element of \code{tObj}.
 #' @details
-#'   The empirical fragment length distribution was estimated using 7 randomly 
+#'   The empirical fragment length distribution was estimated using 7 randomly
 #'   selected RNA-seq samples from the GEUVADIS dataset ('t Hoen et al 2013),
-#'   one sample from each laboratory that performed sequencing for that data 
-#'   set. We used Picard's "CollectInsertSizeMetrics" 
+#'   one sample from each laboratory that performed sequencing for that data
+#'   set. We used Picard's "CollectInsertSizeMetrics"
 #'   (http://broadinstitute.github.io/picard/), version 1.121, to estimate the
-#'   insert size distribution based on the read alignments. 
+#'   insert size distribution based on the read alignments.
 #' @references
-#'   't Hoen PA, et al (2013): Reproducibility of high-throughput mRNA and 
+#'   't Hoen PA, et al (2013): Reproducibility of high-throughput mRNA and
 #'   small RNA sequencing across laboratories. Nature Biotechnology 31(11):
 #'   1015-1022.
-#'  
+#'
 #'   Li W and Jiang T (2012): Transcriptome assembly and isoform expression
 #'   level estimation from biased RNA-Seq reads. Bioinformatics 28(22):
 #'   2914-2921.
@@ -53,27 +53,27 @@
 #' @examples
 #'   library(Biostrings)
 #'   data(srPhiX174)
-#' 
+#'
 #'   ## get fragments with lengths drawn from normal distrubution
 #'   set.seed(174)
-#'   srPhiX174_fragments = generate_fragments(srPhiX174, fraglen=15, fragsd=3, 
+#'   srPhiX174_fragments = generate_fragments(srPhiX174, fraglen=15, fragsd=3,
 #'       readlen=4)
 #'   srPhiX174_fragments
 #'   srPhiX174
-#' 
+#'
 #'   ## get fragments with lengths drawn from an empirical distribution
 #'   empirical_frags = generate_fragments(srPhiX174, distr='empirical')
 #'   empirical_frags
-#'   
+#'
 #'   ## get fragments with lengths from a normal distribution, but include
 #'   ## positional bias from cDNA fragmentation:
 #'   biased_frags = generate_fragments(srPhiX174, bias='cdnaf')
 #'   biased_frags
-#'  
-generate_fragments = function(tObj, fraglen=250, fragsd=25, 
+#'
+generate_fragments = function(tObj, fraglen=250, fragsd=25,
   readlen=100, distr='normal', custdens=NULL, bias='none',
-  frag_GC_bias='none') {
-  
+  frag_GC_bias='none', exon_junction_table) {
+
     bias = match.arg(bias, c('none', 'rnaf', 'cdnaf'))
     distr = match.arg(distr, c('normal', 'empirical', 'custom'))
     L = width(tObj)
@@ -81,7 +81,7 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
         data('empirical_density')
         fraglens = round(rlogspline(L, empirical_density))
     }else if(distr == 'normal'){
-        fraglens = round(rnorm(L, mean=fraglen, sd=fragsd)) 
+        fraglens = round(rnorm(L, mean=fraglen, sd=fragsd))
     }else{
         # distr == 'custom'
         if(is.null(custdens)){
@@ -108,13 +108,41 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
         start_pos = floor(starts_pct * (L[s]-fraglens[s]+2))
         start_pos[start_pos==0] = 1
     }
+
+
+    nonseqinds = (1:length(tObj))[-s]
+    result_ids = c()
+    if (!is.null(exon_junction_table)) {
+      frags_whole_transcript = table(names(tObj)[nonseqinds])
+      frag_ranges = split(IRanges(start = start_pos, width = fraglens[s]), names(tObj)[s])
+
+      result_ids = c(unlist(sapply(names(frags_whole_transcript), function(tr_id)
+        rep(
+          exon_junction_table[transcript_id == tr_id, ID],
+          frags_whole_transcript,
+          frags_whole_transcript[[tr_id]]
+        ), USE.NAMES = F)),
+        unlist(sapply(names(frag_ranges), function(tr_id) {
+          jcts = exon_junction_table[transcript_id == tr_id &
+                                       type == 'junction']
+          ex_ri = exon_junction_table[transcript_id == tr_id &
+                                        type != 'junction']
+          c(rep(
+            jcts$ID,
+            countOverlaps(IRanges(jcts$tr_start, jcts$tr_end), frag_ranges[[tr_id]], type = 'within')
+          ),
+          rep(ex_ri$ID, countOverlaps(
+            IRanges(ex_ri$tr_start, ex_ri$tr_end), frag_ranges[[tr_id]]
+          )))
+        }, USE.NAMES = F)))
+    }
     tObj[s] = subseq(tObj[s], start=start_pos, width=fraglens[s])
     names(tObj)[s] = sprintf("%s;mate1:%d-%d;mate2:%d-%d",
-                             names(tObj)[s], start_pos, start_pos+readlen-1, 
+                             names(tObj)[s], start_pos, start_pos+readlen-1,
                              start_pos+fraglens[s] - readlen,
                              start_pos+fraglens[s] - 1)
-    nonseqinds = (1:length(tObj))[-s]
     names(tObj)[nonseqinds] = sprintf('%s;mate1Start:1;mate2Start:1',names(tObj)[nonseqinds])
+
 
     # fragment GC bias coin flips (Bernoulli trials)
     gc <- as.numeric(letterFrequency(tObj, "GC", as.prob=TRUE))
@@ -126,7 +154,7 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
       tObj <- tObj[ coinflip == 1 ] # only return successes
     }
 
-    return(tObj)
+    return(list(tFrags = tObj, coveredIDs = result_ids))
 }
 
 

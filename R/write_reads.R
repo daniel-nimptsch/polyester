@@ -14,7 +14,7 @@
 #'   assumed to be single-end and just one file, \code{fname.fasta}, is written.
 #' @param gzip If \code{TRUE}, gzip the output fasta files.
 #' @export
-#' @param offset An integer number greater or equal to 1 to start assigning 
+#' @param offset An integer number greater or equal to 1 to start assigning
 #' read numbers at.
 #' @param shuffle If \code{TRUE}, shuffles the reads before writing them to file.
 #' @details The \code{\link{get_reads}} function returns a DNAStringSet object
@@ -36,9 +36,9 @@
 #'
 #' ## If the file is too big, you can subset it and write it in chunks.
 #' ## Here we split our 'reads' into two chunks and save them to the same file.
-#' write_reads(srPhiX174[1:100], fname='./srPhiX174-offset', readlen=readlen, 
+#' write_reads(srPhiX174[1:100], fname='./srPhiX174-offset', readlen=readlen,
 #'    paired=FALSE, gzip=FALSE, offset = 1L)
-#' write_reads(srPhiX174[101:length(srPhiX174)], fname='./srPhiX174-offset', 
+#' write_reads(srPhiX174[101:length(srPhiX174)], fname='./srPhiX174-offset',
 #'    readlen=readlen, paired=FALSE, gzip=FALSE, offset = 101L)
 #'
 #' ## We can verify that we get the same results
@@ -47,10 +47,11 @@
 #' identical(srPhi, srPhiOffset)
 #'
 write_reads = function(reads, fname, readlen, paired=TRUE, gzip, offset=1L,
-                       shuffle=FALSE){
+                       shuffle=FALSE, fastq=TRUE){
     compress = ifelse(is.null(gzip), FALSE, gzip)
     stopifnot(is.integer(offset) & offset >= 1)
     append = ifelse(offset == 1, FALSE, TRUE)
+    format <- ifelse(fastq, 'fastq', 'fasta')
     if(is.null(names(reads))) names(reads) <- rep("", length(reads))
     if(paired){
         lefts = reads[seq(1, length(reads), by=2)]
@@ -58,8 +59,8 @@ write_reads = function(reads, fname, readlen, paired=TRUE, gzip, offset=1L,
         readnumbers = offset:(length(lefts) + offset - 1)
         names(lefts) = sprintf('read%d/%s', readnumbers, names(lefts))
         names(rights) = sprintf('read%d/%s', readnumbers, names(rights))
-        left_filepath = sprintf('%s_1.fasta', fname)
-        right_filepath = sprintf('%s_2.fasta', fname)
+        left_filepath = sprintf('%s_1.%s', fname, format)
+        right_filepath = sprintf('%s_2.%s', fname, format)
         if(shuffle) {
           # store the random seed
           old_seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
@@ -74,12 +75,19 @@ write_reads = function(reads, fname, readlen, paired=TRUE, gzip, offset=1L,
             left_filepath = sprintf('%s.gz', left_filepath)
             right_filepath = sprintf('%s.gz', right_filepath)
         }
-        writeXStringSet(lefts, filepath=left_filepath,
-            format="fasta", width=readlen, compress=compress, append=append)
-        writeXStringSet(rights, filepath=right_filepath,
-            format="fasta", width=readlen, compress=compress, append=append)
+        if (fastq) {
+            writeXStringSet(lefts, filepath=left_filepath,
+                            format=format, compress=compress, append=append)
+            writeXStringSet(rights, filepath=right_filepath,
+                            format=format, compress=compress, append=append)
+        } else {
+            writeXStringSet(lefts, filepath=left_filepath,
+                            format=format, width=readlen, compress=compress, append=append)
+            writeXStringSet(rights, filepath=right_filepath,
+                            format=format, width=readlen, compress=compress, append=append)
+        }
     }else{
-        outf = sprintf('%s.fasta', fname)
+        outf = sprintf('%s.format', fname, format)
         if(compress){
             outf = sprintf('%s.gz', outf)
         }
@@ -90,7 +98,12 @@ write_reads = function(reads, fname, readlen, paired=TRUE, gzip, offset=1L,
           reads <- reads[sample(length(reads))]
           assign(".Random.seed", old_seed, envir = .GlobalEnv)
         }
-        writeXStringSet(reads, filepath=outf, format="fasta", width=readlen,
-            compress=compress, append=append)
+        if (fastq)
+            writeXStringSet(reads, filepath=outf, format=format,
+                            compress=compress, append=append)
+        else
+            writeXStringSet(reads, filepath=outf, format=format, width=readlen,
+                            compress=compress, append=append)
     }
 }
+

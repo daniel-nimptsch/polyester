@@ -4,9 +4,11 @@
 \name{empirical_density}
 \alias{empirical_density}
 \title{Estimated distribution of fragment lengths}
-\format{\code{logspline} object (created with \code{\link{logspline}}) 
+\format{
+\code{logspline} object (created with \code{\link{logspline}}) 
   specifying the empirical density of fragment lengths in the 7 GEUVADIS
-  samples.}
+  samples.
+}
 \description{
 Empirical fragment length distribution was estimated using 7
   randomly selected RNA-seq samples from the GEUVADIS dataset ('t Hoen et
@@ -22,4 +24,3 @@ Empirical fragment length distribution was estimated using 7
   small RNA sequencing across laboratories. Nature Biotechnology 31(11):
   1015-1022.
 }
-

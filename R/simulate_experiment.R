@@ -345,7 +345,7 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL,
         if('idfield' %in% names(extras)){
             idfield = extras$idfield
         }else{
-            idfield = 'transcript_id'        
+            idfield = 'transcript_id'
         }
         if('attrsep' %in% names(extras)){
             attrsep = extras$attrsep
@@ -462,6 +462,7 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL,
         system(paste('mkdir -p', sysoutdir))
     }
 
+    # do the actual sequencing
     # do the actual sequencing
     sgseq(readmat, transcripts, paired, outdir, extras, reportCoverage,ncores=ncores)
 

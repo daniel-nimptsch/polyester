@@ -26,4 +26,5 @@ Suggests:
     doParallel
 LazyLoad: true
 biocViews: Sequencing, DifferentialExpression
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.0
+Encoding: UTF-8

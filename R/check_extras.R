@@ -6,7 +6,7 @@
     if(!('distr' %in% names(extras))){
         extras$distr = 'normal'
     }else{
-        extras$distr = match.arg(extras$distr, 
+        extras$distr = match.arg(extras$distr,
             c('normal', 'empirical', 'custom'))
         if(extras$distr == 'custom' & !('custdens' %in% names(extras))){
             stop(.makepretty('to use custom fragment distribution, provide
@@ -85,6 +85,22 @@
 
     if (!('shuffle' %in% names(extras))) {
        extras$shuffle <- FALSE
+    }
+    if(!('exon_junction_coverage' %in% names(extras))){
+      extras$exon_junction_coverage <- FALSE
+    } else {
+      if (!('exon_junction_table' %in% names(extras))) {
+        stop("to use exon junction coverage please provide an exon junction table. This option should only be called inside of 'simulate_alternative_splicing'.")
+      } else {
+        if (!(is.data.table(extras$exon_junction))) {
+          stop("please provide an exon junction table as data.table. This option should only be called inside of 'simulate_alternative_splicing'.")
+        } else {
+          if (any(!(c('transcript_id', 'type', 'tr_start', 'tr_end') %in% names(extras$exon_junction_table))))
+            stop("please provide columns 'transcript_id', 'type', 'tr_start', 'tr_end' in exon junction table. This option should only be called inside of 'simulate_alternative_splicing'.")
+          else
+          extras$exon_junction_table = extras$exon_junction_table[, ID := as.character(.I)]
+        }
+      }
     }
     return(extras)
 

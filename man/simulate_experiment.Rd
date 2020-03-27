@@ -4,10 +4,20 @@
 \alias{simulate_experiment}
 \title{simulate RNA-seq experiment using negative binomial model}
 \usage{
-simulate_experiment(fasta = NULL, gtf = NULL, seqpath = NULL,
-  outdir = ".", num_reps = c(10, 10), reads_per_transcript = 300,
-  size = NULL, fold_changes, paired = TRUE, reportCoverage = FALSE,
-  ncores = 1L, ...)
+simulate_experiment(
+  fasta = NULL,
+  gtf = NULL,
+  seqpath = NULL,
+  outdir = ".",
+  num_reps = c(10, 10),
+  reads_per_transcript = 300,
+  size = NULL,
+  fold_changes,
+  paired = TRUE,
+  reportCoverage = FALSE,
+  ncores = 1L,
+  ...
+)
 }
 \arguments{
 \item{fasta}{path to FASTA file containing transcripts from which to simulate
