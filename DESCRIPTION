@@ -19,7 +19,8 @@ Imports:
     logspline,
     limma,
     parallel,
-    zlibbioc
+    zlibbioc,
+    data.table (>= 1.9.8)
 Suggests:
     knitr,
     ballgown,

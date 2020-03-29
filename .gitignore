@@ -10,3 +10,4 @@ vignettes/timecourse_reads
 vignettes/polyester.html
 *.Rproj*
 .RData
+.Rproj.user
