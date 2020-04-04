@@ -92,7 +92,7 @@
       if (!('exon_junction_table' %in% names(extras))) {
         stop("to use exon junction coverage please provide an exon junction table. This option should only be called inside of 'simulate_alternative_splicing'.")
       } else {
-        if (!(is.data.table(extras$exon_junction))) {
+        if (!(is.data.table(extras$exon_junction_table))) {
           stop("please provide an exon junction table as data.table. This option should only be called inside of 'simulate_alternative_splicing'.")
         } else {
           if (any(!(c('transcript_id', 'type', 'tr_start', 'tr_end') %in% names(extras$exon_junction_table))))
