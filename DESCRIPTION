@@ -25,6 +25,7 @@ Suggests:
     knitr,
     ballgown,
     doParallel
+Repository: GitHub
 LazyLoad: true
 biocViews: Sequencing, DifferentialExpression
 RoxygenNote: 7.1.0
