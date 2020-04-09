@@ -282,6 +282,8 @@
 #'   Default \code{"; "}.
 #'   \item \code{shuffle}: should the reads be shuffled before written to file?
 #'   Default \code{FALSE}.
+#'   \item \code{verbose}: should progress messages be printed during the sequencing process?
+#'   Default \code{FALSE}.
 #'   }
 #'
 #' @references

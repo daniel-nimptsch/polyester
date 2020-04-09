@@ -86,7 +86,8 @@
     if (!('shuffle' %in% names(extras))) {
        extras$shuffle <- FALSE
     }
-    if(!('exon_junction_coverage' %in% names(extras))){
+    # for alternative splicing simulator:
+    if (!('exon_junction_coverage' %in% names(extras))){
       extras$exon_junction_coverage <- FALSE
     } else {
       if (!('exon_junction_table' %in% names(extras))) {
@@ -101,6 +102,9 @@
           extras$exon_junction_table = extras$exon_junction_table[, ID := as.character(.I)]
         }
       }
+    }
+    if (!('verbose' %in% names(extras))) {
+      extras$verbose <- FALSE
     }
     return(extras)
 

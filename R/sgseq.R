@@ -1,17 +1,3 @@
-.check_coverage <- function(mates, transcript, readlen){
-  fromStart <- mates[1] == 'mate1Start:1'
-  if (fromStart) {
-    #TODO: check if readlength is right with polyester
-    reads <- IRanges(c(1, max(transcript$tr_end) - readlen + 1L), c(readlen, max(transcript$tr_end)))
-  } else {
-    coords <- as.numeric(unlist(strsplit(substring(mates, 7), '-', T)))
-    reads <- IRanges(coords[c(1,3)], coords[c(2,4)])
-  }
-  exon_ids <- transcript[type == 'exon' & IRanges(tr_start, tr_end) %over% reads]$exon_id
-  jct_ids <- transcript[type == 'junction' & IRanges(tr_start, tr_end) %within% reads]$exon_id
-  return(c(exon_ids, jct_ids))
-}
-
 #' Internal sequencing function
 #'
 #' This internal function actually does the sequencing in the following steps:
@@ -52,13 +38,13 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
     for(i in 1:length(templates)){coverage_matrices = c(coverage_matrices, list(matrix(0, ncol=dim(readmat)[2], width(templates)[i])))}
     names(coverage_matrices) = names(templates)
   }
-
-  message('start sequencing... (1m reads per iteration)')
+  
+  if (extras$verbose) message('start sequencing... (1m reads per iteration)')
 
   exon_junction_counts <- parallel::mclapply(seq_len(ncol(readmat)), function(i) {
     sample_name = sprintf("sample_%02d", i)
 
-    message(sprintf('%s: overall %d reads', sample_name, sum(readmat[,i])))
+    if (extras$verbose) message(sprintf('%s: overall %d reads', sample_name, sum(readmat[,i])))
     ##$ begin small chunk regarding fragment GC bias or not
     if (is.matrix(extras$frag_GC_bias)) {
       frag_GC_bias <- extras$frag_GC_bias[,i]
@@ -71,12 +57,12 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
     offset = 1L
     region_counts <- list()
     for(iteration in seq_len(iterations)) {
-      message(sprintf('%s: iteration %02d', sample_name, iteration))
+      if (extras$verbose) message(sprintf('%s: iteration %02d', sample_name, iteration))
       tSubset = tObj[offset:min(offset+999999L, length(tObj))] ## corrected value of integer added to offset to avoid duplicating reads
       tFrags = generate_fragments(tSubset, extras$fraglen[i], extras$fragsd[i],
                                   extras$readlen, extras$distr, extras$custdens,
                                   extras$bias, frag_GC_bias, extras$exon_junction_table)
-      message(sprintf('%s: fragments generated', sample_name))
+      if (extras$verbose) message(sprintf('%s: fragments generated', sample_name))
       if (extras$exon_junction_coverage) {
         covered_IDs = table(tFrags$coveredIDs)
         covered_IDs = data.table(
@@ -119,7 +105,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       }
 
       #write read pairs
-      message(sprintf('%s: write read pairs', sample_name))
+      if (extras$verbose) message(sprintf('%s: write read pairs', sample_name))
       write_reads(errReads, readlen=extras$readlen,
           fname=file.path(outdir, sample_name), paired=paired,
           gzip=extras$gzip, offset=offset, shuffle = extras$shuffle, fastq = extras$fastq)
@@ -140,7 +126,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
     extras$exon_junction_table$ID <- NULL
     fwrite(x = extras$exon_junction_table, file = file.path(outdir, 'exon_junction_coverage.tsv'), quote = F, sep = '\t')
   }
-  message('finished sequencing')
+  if (extras$verbose) message('finished sequencing')
   invisible(NULL)
 }
 
