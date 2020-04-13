@@ -66,7 +66,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       if (extras$exon_junction_coverage) {
         covered_IDs = table(tFrags$coveredIDs)
         covered_IDs = data.table(
-          ID = names(covered_IDs),
+          ASS_ID = names(covered_IDs),
           count_ = as.vector(covered_IDs)
         )
         region_counts[[iteration]] = covered_IDs
@@ -113,17 +113,17 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
     }
     if(extras$exon_junction_coverage){
       region_counts = rbindlist(region_counts)
-      region_counts = region_counts[, (sum = sum(.SD[[1]])), by = ID]
+      region_counts = region_counts[, (sum = sum(.SD[[1]])), by = ASS_ID]
       names(region_counts)[2] <- sample_name
       return(region_counts)
     }
   }, mc.cores = ifelse(ncol(readmat) >= ncores, ncores, ncol(readmat)))
   if (extras$exon_junction_coverage) {
     exon_junction_counts <- Reduce(function(x, y)
-      merge(x, y, by = 'ID', all = T), exon_junction_counts)
-    sample_names <- names(exon_junction_counts)['ID' != names(exon_junction_counts)]
-    extras$exon_junction_table[exon_junction_counts, on = 'ID', get('sample_names') := mget(paste0('i.', sample_names))]
-    extras$exon_junction_table$ID <- NULL
+      merge(x, y, by = 'ASS_ID', all = T), exon_junction_counts)
+    sample_names <- names(exon_junction_counts)['ASS_ID' != names(exon_junction_counts)]
+    extras$exon_junction_table[exon_junction_counts, on = 'ASS_ID', get('sample_names') := mget(paste0('i.', sample_names))]
+    extras$exon_junction_table$ASS_ID <- NULL
     fwrite(x = extras$exon_junction_table, file = file.path(outdir, 'exon_junction_coverage.tsv'), quote = F, sep = '\t')
   }
   if (extras$verbose) message('finished sequencing')

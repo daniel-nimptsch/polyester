@@ -99,7 +99,7 @@
           if (any(!(c('transcript_id', 'type', 'tr_start', 'tr_end') %in% names(extras$exon_junction_table))))
             stop("please provide columns 'transcript_id', 'type', 'tr_start', 'tr_end' in exon junction table. This option should only be called inside of 'simulate_alternative_splicing'.")
           else
-          extras$exon_junction_table = extras$exon_junction_table[, ID := as.character(.I)]
+          extras$exon_junction_table = extras$exon_junction_table[, ASS_ID := as.character(.I)]
         }
       }
     }

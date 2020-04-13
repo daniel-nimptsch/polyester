@@ -284,6 +284,13 @@
 #'   Default \code{FALSE}.
 #'   \item \code{verbose}: should progress messages be printed during the sequencing process?
 #'   Default \code{FALSE}.
+#'   \item only to be called inside the function \code{simulate_alternative_splicing}:
+#'   \itemize{
+#'   \item \code{exon_junction_coverage}: should the coverage of exons, junctions and retained introns be determined? 
+#'   If \code{TRUE}, a \code{data.table} must be provided in \code{exon_junction_table}. See \code{exon_junction_table} for details.
+#'   \item \code{exon_junction_table}: \code{data.table} which contains the columns \code{'transcript_id', 'type', 'tr_start', 'tr_end'} 
+#'   and is used to determie the coverage of exons, junctions and retained introns.
+#'   }
 #'   }
 #'
 #' @references

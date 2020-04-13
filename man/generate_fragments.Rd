@@ -52,6 +52,8 @@ transcript. The probability models used come from Supplementary Figure S3
 of Li and Jiang (2012).}
 
 \item{frag_GC_bias}{See explanation in \code{\link{simulate_experiment}}.}
+
+\item{exon_junction_table}{See explanation in \code{\link{simulate_experiment}}.}
 }
 \value{
 DNAStringSet consisting of one randomly selected subsequence per

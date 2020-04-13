@@ -145,6 +145,7 @@ The following parameters can be provided to `simulate_experiment` and `simulate_
 * `meanmodel`: Set to TRUE to estimate `reads_per_transcript` as a data-driven function of transcript length. Ignored in `simulate_experiment_countmat`. 
 * `lib_sizes`: multiplicative library size factor for each replicate in the experiment. Ignored in `simulate_experiment_countmat`. 
 * `shuffle`: Set to TRUE to shuffle each chunk of simulated reads before writing them to file. This is important for most downstream quantification tools, as they expect the reads to not be in order.
+* `verbose`: set to TRUE to print progress messages during the sequencing process
 
 For most of these parameters, you can see additional, precise documentation using `?simulate_experiment`. Also, [this review paper](http://genomebiology.com/2010/11/12/220) (Oshlack, Robinson, and Young, _Genome Biology_ 2010, open access) provides a good overview of the RNA sequencing process, and might be particularly useful for understanding where some of these simulation parameters come into play. If you'd like to explore or change specific steps in the sequencing process (fragmentation, reverse-complementing, error-adding), the internal functions called within `simulate_experiment` are available and individually documented in Polyester.
 

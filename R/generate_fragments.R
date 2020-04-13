@@ -29,6 +29,7 @@
 #'   transcript. The probability models used come from Supplementary Figure S3
 #'   of Li and Jiang (2012).
 #' @param frag_GC_bias See explanation in \code{\link{simulate_experiment}}.
+#' @param exon_junction_table See explanation in \code{\link{simulate_experiment}}.
 #' @export
 #' @return DNAStringSet consisting of one randomly selected subsequence per
 #'   element of \code{tObj}.
@@ -118,7 +119,7 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
 
       result_ids = c(unlist(sapply(names(frags_whole_transcript), function(tr_id)
         rep(
-          exon_junction_table[transcript_id == tr_id, ID],
+          exon_junction_table[transcript_id == tr_id, ASS_ID],
           frags_whole_transcript,
           frags_whole_transcript[[tr_id]]
         ), USE.NAMES = F)),
@@ -128,10 +129,10 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
           ex_ri = exon_junction_table[transcript_id == tr_id &
                                         type != 'junction']
           c(rep(
-            jcts$ID,
+            jcts$ASS_ID,
             countOverlaps(IRanges(jcts$tr_start, jcts$tr_end), frag_ranges[[tr_id]], type = 'within')
           ),
-          rep(ex_ri$ID, countOverlaps(
+          rep(ex_ri$ASS_ID, countOverlaps(
             IRanges(ex_ri$tr_start, ex_ri$tr_end), frag_ranges[[tr_id]]
           )))
         }, USE.NAMES = F)))
