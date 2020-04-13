@@ -117,7 +117,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       names(region_counts)[2] <- sample_name
       return(region_counts)
     }
-  }, mc.cores = ifelse(ncol(readmat) >= ncores, ncores, ncol(readmat)))
+  }, mc.cores = ifelse(ncol(readmat) >= ncores, ncores, ncol(readmat)), mc.set.seed = T)
   if (extras$exon_junction_coverage) {
     exon_junction_counts <- Reduce(function(x, y)
       merge(x, y, by = 'ASS_ID', all = T), exon_junction_counts)
