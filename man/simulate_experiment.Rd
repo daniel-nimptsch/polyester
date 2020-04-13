@@ -219,13 +219,16 @@ Reads can either be simulated from a FASTA file of transcripts
   \item \code{attrsep}: (passed to \code{\link{seq_gtf}}) in the
   \code{attributes} column of \code{gtf}, how are attributes separated?
   Default \code{"; "}.
-  \item \code{shuffle}: should the reads be shuffled before written to file?
+  \item \code{shuffle}: Should the reads be shuffled before written to file?
   Default \code{FALSE}.
-  \item \code{verbose}: should progress messages be printed during the sequencing process?
+  \item \code{verbose}: Should progress messages be printed during the sequencing process?
   Default \code{FALSE}.
+  \item \code{seq_depth}: Number of reads to be sequenced per sample. Can be a vector of length one or \code{sum(num_reps)}.
+  Readcounts will be multiplied by a factor to be equal to \code{seq_depth}. 
+  If used with \code{lib_sizes}, \code{seq_depth} will be applied first.
   \item only to be called inside the function \code{simulate_alternative_splicing}:
   \itemize{
-  \item \code{exon_junction_coverage}: should the coverage of exons, junctions and retained introns be determined? 
+  \item \code{exon_junction_coverage}: Should the coverage of exons, junctions and retained introns be determined? 
   If \code{TRUE}, a \code{data.table} must be provided in \code{exon_junction_table}. See \code{exon_junction_table} for details.
   \item \code{exon_junction_table}: \code{data.table} which contains the columns \code{'transcript_id', 'type', 'tr_start', 'tr_end'} 
   and is used to determie the coverage of exons, junctions and retained introns.
