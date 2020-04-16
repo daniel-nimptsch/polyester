@@ -88,7 +88,7 @@
 
     rep_info = data.frame(
         rep_id=paste0('sample_', sprintf('%02d', 1:sum(num_reps))),
-        group=group_ids, lib_sizes=extras$lib_sizes)
+        group=group_ids, lib_sizes=extras$lib_sizes, seq_depth_multiplier=extras$seq_depth_multiplier)
 
     write.table(rep_info, row.names=FALSE, quote=FALSE, sep='\t',
                 file=sprintf('%s/sim_rep_info.txt', outdir))
@@ -282,6 +282,8 @@
 #'   Default \code{"; "}.
 #'   \item \code{shuffle}: Should the reads be shuffled before written to file?
 #'   Default \code{FALSE}.
+#'   \item \code{fastq}: Should the reads be written into fastq files instead of fasta files?
+#'   Default \code{FALSE}
 #'   \item \code{verbose}: Should progress messages be printed during the sequencing process?
 #'   Default \code{FALSE}.
 #'   \item \code{seq_depth}: Number of reads to be sequenced per sample. Can be a vector of length one or \code{sum(num_reps)}.
@@ -453,9 +455,11 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL,
         NB(as.matrix(basemeans)[,group_id], as.matrix(size)[,group_id])
     })
     readmat = matrix(unlist(numreadsList), ncol=sum(num_reps))
-    if('seq_depth' %in% names(extras)){
-      readmat = t(t(readmat) * (extras$seq_depth/colSums(readmat)))
-      mode(readmat) <- "integer"
+    extras$seq_depth_multiplier = rep(1, sum(num_reps))
+    if ('seq_depth' %in% names(extras)){
+      extras$seq_depth_multiplier = extras$seq_depth/colSums(readmat)
+      readmat = t(t(readmat) * extras$seq_depth_multiplier)
+      mode(readmat) = "integer"
     }
     readmat = t(extras$lib_sizes * t(readmat))
     if('gcbias' %in% names(extras)){

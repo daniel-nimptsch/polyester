@@ -221,6 +221,8 @@ Reads can either be simulated from a FASTA file of transcripts
   Default \code{"; "}.
   \item \code{shuffle}: Should the reads be shuffled before written to file?
   Default \code{FALSE}.
+  \item \code{fastq}: Should the reads be written into fastq files instead of fasta files?
+  Default \code{FALSE}
   \item \code{verbose}: Should progress messages be printed during the sequencing process?
   Default \code{FALSE}.
   \item \code{seq_depth}: Number of reads to be sequenced per sample. Can be a vector of length one or \code{sum(num_reps)}.

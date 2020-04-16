@@ -86,6 +86,19 @@
     if (!('shuffle' %in% names(extras))) {
        extras$shuffle <- FALSE
     }
+    if (!('fastq' %in% names(extras))) {
+      extras$fastq <- FALSE
+    }
+    if (!('verbose' %in% names(extras))) {
+      extras$verbose <- FALSE
+    }
+    if ('seq_depth' %in% names(extras)) {
+      stopifnot(is.numeric(extras$seq_depth))
+      if(length(extras$seq_depth) == 1)
+        extras$seq_depth <- rep(extras$seq_depth, total.n)
+      else 
+        stopifnot(length(extras$seq_depth) == total.n)
+    }
     # for alternative splicing simulator:
     if (!('exon_junction_coverage' %in% names(extras))){
       extras$exon_junction_coverage <- FALSE
@@ -102,16 +115,6 @@
           extras$exon_junction_table = extras$exon_junction_table[, ASS_ID := as.character(.I)]
         }
       }
-    }
-    if (!('verbose' %in% names(extras))) {
-      extras$verbose <- FALSE
-    }
-    if ('seq_depth' %in% names(extras)) {
-      stopifnot(is.numeric(extras$seq_depth))
-      if(length(extras$seq_depth) == 1)
-        extras$seq_depth <- rep(extras$seq_depth, total.n)
-      else 
-        stopifnot(length(extras$seq_depth) == total.n)
     }
     return(extras)
 
