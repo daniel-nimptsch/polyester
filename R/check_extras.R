@@ -106,7 +106,7 @@
       if (!('exon_junction_table' %in% names(extras))) {
         stop("to use exon junction coverage please provide an exon junction table. This option should only be called inside of 'simulate_alternative_splicing'.")
       } else {
-        if (!(is.data.table(extras$exon_junction_table))) {
+        if (!(data.table::is.data.table(extras$exon_junction_table))) {
           stop("please provide an exon junction table as data.table. This option should only be called inside of 'simulate_alternative_splicing'.")
         } else {
           if (any(!(c('transcript_id', 'type', 'tr_start', 'tr_end') %in% names(extras$exon_junction_table))))
@@ -116,6 +116,24 @@
         }
       }
     }
+    if ('adapter_contamination' %in% names(extras)) {
+      stopifnot(is.logical(extras$adapter_contamination))
+      if (extras$adapter_contamination) {
+        if ('adapter_sequence' %in% names(extras)){
+          stopifnot(is.character(extras$adapter_sequence))
+        } else 
+          extras$adapter_sequence <- 'CTGTCTCTTATACACATCT'
+      }
+    } else 
+      extras$adapter_contamination <- FALSE
+    if ('pcr_rate' %in% names(extras)) {
+      stopifnot(extras$pcr_rate >= 0 & extras$pcr_rate <= 1)
+      if ('pcr_lambda' %in% names(extras)) {
+        stopifnot(is.numeric(extras$pcr_lambda))
+      } else
+        extras$pcr_lambda <- 1
+    } else 
+      extras$pcr_rate <- NULL
     return(extras)
 
 }

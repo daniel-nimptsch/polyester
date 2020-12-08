@@ -13,7 +13,9 @@ generate_fragments(
   custdens = NULL,
   bias = "none",
   frag_GC_bias = "none",
-  exon_junction_table
+  exon_junction_table,
+  pcr_rate = NULL,
+  pcr_lambda = NULL
 )
 }
 \arguments{
@@ -54,6 +56,10 @@ of Li and Jiang (2012).}
 \item{frag_GC_bias}{See explanation in \code{\link{simulate_experiment}}.}
 
 \item{exon_junction_table}{See explanation in \code{\link{simulate_experiment}}.}
+
+\item{pcr_rate}{See explanation in \code{\link{simulate_experiment}}.}
+
+\item{pcr_lambda}{See explanation in \code{\link{simulate_experiment}}.}
 }
 \value{
 DNAStringSet consisting of one randomly selected subsequence per

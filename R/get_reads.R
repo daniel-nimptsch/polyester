@@ -19,12 +19,12 @@
 #'   srPhiX174_reads = get_reads(srPhiX174, readlen=15, paired=FALSE)
 #'   srPhiX174_reads  
 #'   # set of single-end, 15bp reads, treating srPhiX174 as the fragments
-get_reads = function(tFrags, readlen, paired=TRUE){
+get_reads = function(tFrags, readlen, paired=TRUE, adapter_contamination = FALSE, adapter_sequence = NULL){
   
     # when fragments are shorter than reads:
-    isShort = (width(tFrags) <= readlen)
+    isShort = (width(tFrags) < readlen)
     isLong = !isShort
-      
+    
     if(paired) {
       
         if(sum(isShort) > 0){
@@ -37,6 +37,10 @@ get_reads = function(tFrags, readlen, paired=TRUE){
             outInds[seq(2, length(outInds), by=2)] = (1:length(x))+length(x)
             outShort = out[outInds] # puts pairs of reads next to each other
             names(outShort) = paste0(rep(names(tFrags)[isShort], each=2))
+            if(adapter_contamination) {
+              subseq(outShort, start = width(outShort) + 1) <- adapter_sequence
+              subseq(outShort[width(outShort) > readlen], start = (readlen + 1)) <- ''
+            }
         }
     
         if(sum(isLong) > 0){
@@ -66,7 +70,10 @@ get_reads = function(tFrags, readlen, paired=TRUE){
     } else { #single end
       theReads = tFrags
       theReads[isLong] = subseq(tFrags[isLong], start=1, end=readlen)
+      if(adapter_contamination){
+        subseq(theReads[isShort], start = width(theReads[isShort]) + 1) <- adapter_sequence
+        subseq(theReads[isShort][width(theReads[isShort]) > readlen], start = (readlen + 1)) <- ''
+      }
       return(theReads)
     }
-    
 }

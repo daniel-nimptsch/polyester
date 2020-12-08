@@ -30,6 +30,8 @@
 #'   of Li and Jiang (2012).
 #' @param frag_GC_bias See explanation in \code{\link{simulate_experiment}}.
 #' @param exon_junction_table See explanation in \code{\link{simulate_experiment}}.
+#' @param pcr_rate See explanation in \code{\link{simulate_experiment}}.
+#' @param pcr_lambda See explanation in \code{\link{simulate_experiment}}.
 #' @export
 #' @return DNAStringSet consisting of one randomly selected subsequence per
 #'   element of \code{tObj}.
@@ -73,7 +75,7 @@
 #'
 generate_fragments = function(tObj, fraglen=250, fragsd=25,
   readlen=100, distr='normal', custdens=NULL, bias='none',
-  frag_GC_bias='none', exon_junction_table) {
+  frag_GC_bias='none', exon_junction_table, pcr_rate = NULL, pcr_lambda = NULL) {
 
     bias = match.arg(bias, c('none', 'rnaf', 'cdnaf'))
     distr = match.arg(distr, c('normal', 'empirical', 'custom'))
@@ -143,9 +145,19 @@ generate_fragments = function(tObj, fraglen=250, fragsd=25,
                              start_pos+fraglens[s] - readlen,
                              start_pos+fraglens[s] - 1)
     names(tObj)[nonseqinds] = sprintf('%s;mate1Start:1;mate2Start:1',names(tObj)[nonseqinds])
-
+    
+    
+    #add pcr bias
+    if (!is.null(pcr_rate)) {
+      duplicate_indx <- sample.int(length(tObj), floor(length(tObj)*pcr_rate))
+      n_dups <- rpois(length(duplicate_indx), lambda = pcr_lambda) + 1
+      pcrDups <- rep(tObj[duplicate_indx], n_dups)
+      names(pcrDups) <- sprintf('PCR_DUP;%s', names(pcrDups))
+      tObj <- c(tObj, pcrDups)
+    }
 
     # fragment GC bias coin flips (Bernoulli trials)
+    # TODO: if frag_GC_bias we throw something away that is already counted
     gc <- as.numeric(letterFrequency(tObj, "GC", as.prob=TRUE))
     if (is.numeric(frag_GC_bias)) {
       gc.idx <- as.integer(cut(gc, breaks=c(-Inf,(0:99)/100+.005,Inf)))

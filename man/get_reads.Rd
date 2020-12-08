@@ -4,7 +4,13 @@
 \alias{get_reads}
 \title{get sequencing reads from fragments}
 \usage{
-get_reads(tFrags, readlen, paired = TRUE)
+get_reads(
+  tFrags,
+  readlen,
+  paired = TRUE,
+  adapter_contamination = FALSE,
+  adapter_sequence = NULL
+)
 }
 \arguments{
 \item{tFrags}{DNAStringSet representing fragments}

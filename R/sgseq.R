@@ -61,11 +61,12 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       tSubset = tObj[offset:min(offset+999999L, length(tObj))] ## corrected value of integer added to offset to avoid duplicating reads
       tFrags = generate_fragments(tSubset, extras$fraglen[i], extras$fragsd[i],
                                   extras$readlen, extras$distr, extras$custdens,
-                                  extras$bias, frag_GC_bias, extras$exon_junction_table)
+                                  extras$bias, frag_GC_bias, extras$exon_junction_table,
+                                  extras$pcr_rate, extras$pcr_lambda)
       if (extras$verbose) message(sprintf('%s: fragments generated', sample_name))
       if (extras$exon_junction_coverage) {
         covered_IDs = table(tFrags$coveredIDs)
-        covered_IDs = data.table(
+        covered_IDs = data.table::data.table(
           ASS_ID = names(covered_IDs),
           count_ = as.vector(covered_IDs)
         )
@@ -78,7 +79,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       }
 
       #get reads from fragments
-      reads = get_reads(tFrags, extras$readlen, paired)
+      reads = get_reads(tFrags, extras$readlen, paired, extras$adapter_contamination, extras$adapter_sequence)
       if(reportCoverage==TRUE){
             read_info = unique(names(reads))
             read_info_split = strsplit(read_info, ";mate1:|;mate2:")
@@ -94,7 +95,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
                   save(coverage_matrices, file=file.path(outdir, 'sample_coverages.rda') )
             }
       }
-
+      
       #add sequencing error
       if(extras$error_model == 'uniform'){
           errReads = add_error(reads, extras$error_rate)
@@ -112,7 +113,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
       offset = offset + 1e6L
     }
     if(extras$exon_junction_coverage){
-      region_counts = rbindlist(region_counts)
+      region_counts = data.table::rbindlist(region_counts)
       region_counts = region_counts[, (sum = sum(.SD[[1]])), by = ASS_ID]
       names(region_counts)[2] <- sample_name
       return(region_counts)
@@ -124,7 +125,7 @@ sgseq = function(readmat, transcripts, paired, outdir, extras, reportCoverage=FA
     sample_names <- names(exon_junction_counts)['ASS_ID' != names(exon_junction_counts)]
     extras$exon_junction_table[exon_junction_counts, on = 'ASS_ID', get('sample_names') := mget(paste0('i.', sample_names))]
     extras$exon_junction_table$ASS_ID <- NULL
-    fwrite(x = extras$exon_junction_table, file = file.path(outdir, 'exon_junction_coverage.tsv'), quote = F, sep = '\t')
+    data.table::fwrite(x = extras$exon_junction_table, file = file.path(outdir, 'exon_junction_coverage.tsv'), quote = F, sep = '\t')
   }
   if (extras$verbose) message('finished sequencing')
   invisible(NULL)

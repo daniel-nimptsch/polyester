@@ -148,6 +148,10 @@ The following parameters can be provided to `simulate_experiment` and `simulate_
 * `fastq`: Set to TRUE to write reads into fastq files instead of fasta files.
 * `verbose`: Set to TRUE to print progress messages during the sequencing process
 * `seq_depth`: Number of reads to be sequenced per sample. Can be a vector of length one or `sum(num_reps)`. Readcounts will be multiplied by a factor to be equal to `seq_depth`. If used with `lib_sizes`, `seq_depth` will be applied first.
+* `pcr_rate`: Fraction of fragments that will be duplicated. Reads from these fragments will have PCR_DUP in the name.
+* `pcr_lambda`: If `!is.null(pcr_rate)` lambda for the poisson distribution to draw the number of duplicates.
+* `adapter_contamination`: If the fragment is smaller than the readlength, should we sequence into the `adapter_sequence`?
+* `adapter_sequence`:If `adapter_contamination`: adapter sequence
 
 For most of these parameters, you can see additional, precise documentation using `?simulate_experiment`. Also, [this review paper](http://genomebiology.com/2010/11/12/220) (Oshlack, Robinson, and Young, _Genome Biology_ 2010, open access) provides a good overview of the RNA sequencing process, and might be particularly useful for understanding where some of these simulation parameters come into play. If you'd like to explore or change specific steps in the sequencing process (fragmentation, reverse-complementing, error-adding), the internal functions called within `simulate_experiment` are available and individually documented in Polyester.
 

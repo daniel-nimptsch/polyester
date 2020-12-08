@@ -289,6 +289,14 @@
 #'   \item \code{seq_depth}: Number of reads to be sequenced per sample. Can be a vector of length one or \code{sum(num_reps)}.
 #'   Readcounts will be multiplied by a factor to be equal to \code{seq_depth}. 
 #'   If used with \code{lib_sizes}, \code{seq_depth} will be applied first.
+#'   \item \code{pcr_rate}: Fraction of fragments that will be duplicated. Reads from these fragments will have PCR_DUP in the name.
+#'   Default \code{NULL}
+#'   \item \code{pcr_lambda}: If \code{!is.null(pcr_rate)} lambda for the poisson distribution to draw the number of duplicates.
+#'   Default 1
+#'   \item \code{adapter_contamination}: If the fragment is smaller than the readlength, should we sequence into the adapter_sequence?
+#'   Default \code{FALSE}
+#'   \item \code{adapter_sequence}: If \code{adapter_contamination} adaptor sequence
+#'   Default 'CTGTCTCTTATACACATCT'
 #'   \item only to be called inside the function \code{simulate_alternative_splicing}:
 #'   \itemize{
 #'   \item \code{exon_junction_coverage}: Should the coverage of exons, junctions and retained introns be determined? 
