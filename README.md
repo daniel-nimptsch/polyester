@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/alyssafrazee/polyester.svg?branch=master)](https://travis-ci.org/alyssafrazee/polyester)
+# Important Note
+
+This is a customized polyester repository used for the [ASimulatoR package](https://github.com/biomedbigdata/ASimulatoR).
 
 # Introduction
 
@@ -131,13 +133,13 @@ The following parameters can be provided to `simulate_experiment` and `simulate_
 
 * `readlen`: Read length (default 100)
 * `paired`: Whether the reads should be paired-end (default TRUE)
-* `distr`: Distribution from which to draw the fragment lengths. Default is `'normal'`, mean=250 and sd=25. Other options are `'empirical'` and `'custom'`. `'empirical'` means fragment lengths are drawn from a length distribution we estimated from real data, and `'custom'` requires you to provide a `logspline` density object from which you'd like to draw the fragment lengths.
+* `distr`: Distribution from which to draw the fragment lengths. Default is `'normal'`, mean=250 and sd=25. Other options are `'empirical'` and `'custom'`. `'empirical'` means fragment lengths are drawn from a length distribution Frazee et al estimated from real data, and `'custom'` requires you to provide a `logspline` density object from which you'd like to draw the fragment lengths.
 * `fraglen`: The mean fragment length, if using a normal distribution (default 250)
 * `fragsd`: Standard devation of fragment lengths, if using a normal distribution (default 25)
-* `error_model`: How should sequencing errors be simulated? The default is that sequencing errors are uniformly distributed across samples, reads, and nucleotides, at an error rate of 0.5\%. Other options are `'illumina4'`, `'illumina5'`, and `'custom'`, where the Illumina error models were estimated from a real data set and ship with GemSIM (McElroy, Luciani, and Thomas 2012), and `'custom'` allows you to use GemSIM to estimate an error model from your data set. See `?add_platform_error` and/or the [GemSIM paper](http://www.biomedcentral.com/1471-2164/13/74) for details. Code we used to modify GemSIM's Illumina error models for Polyester are available at our [GitHub repository](https://github.com/alyssafrazee/polyester/blob/master/ErrorModels.md). 
+* `error_model`: How should sequencing errors be simulated? The default is that sequencing errors are uniformly distributed across samples, reads, and nucleotides, at an error rate of 0.5\%. Other options are `'illumina4'`, `'illumina5'`, and `'custom'`, where the Illumina error models were estimated from a real data set and ship with GemSIM (McElroy, Luciani, and Thomas 2012), and `'custom'` allows you to use GemSIM to estimate an error model from your data set. See `?add_platform_error` and/or the [GemSIM paper](http://www.biomedcentral.com/1471-2164/13/74) for details. Code Frazee et al used to modify GemSIM's Illumina error models for Polyester are available at the [GitHub repository](https://github.com/biomedbigdata/polyester/blob/master/ErrorModels.md). 
 * `error_rate`: In the uniform error model, probability that the sequencer records the wrong nucleotide at any given base (default 0.005). 
-* `bias`: Positional bias model to use when fragmenting transcripts. By default, all fragments from a transcript are equally likely (`'none'`). Other choices are `'rnaf'` and `'cdnaf'`, which mimic positional bias arising from different fragmentation protocols. See `?generate_fragments` and our manuscript (Frazee et al, 2014) for details.
-* `gc_bias`: sample-specific GC bias models to be used to change expression values after read numbers are assigned. We modeled transcript expression as a function of GC content for 7 biological replicates in a real data set, and shift expression values accordingly. See `?add_gc_bias` for details. Ignored in `simulate_experiment_countmat`.
+* `bias`: Positional bias model to use when fragmenting transcripts. By default, all fragments from a transcript are equally likely (`'none'`). Other choices are `'rnaf'` and `'cdnaf'`, which mimic positional bias arising from different fragmentation protocols. See `?generate_fragments` and the manuscript (Frazee et al, 2014) for details.
+* `gc_bias`: sample-specific GC bias models to be used to change expression values after read numbers are assigned. Frazee et al modeled transcript expression as a function of GC content for 7 biological replicates in a real data set, and shift expression values accordingly. See `?add_gc_bias` for details. Ignored in `simulate_experiment_countmat`.
 * `frag_GC_bias`: A sample-specific GC content bias on the
   fragment level instead of the transcript level. See `?simulate_experiment`
 * `strand_specific`: Whether the experiment should be strand-specific
