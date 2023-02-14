@@ -45,7 +45,7 @@ Simulating an RNA-seq experiment with Polyester generally requires just one func
 
 A FASTA file called `chr22.fa` is provided with `polyester`. This file contains sequences for 918 transcripts on chromosome 22, as annotated in hg19. For this very small example, we will only simulate from the first 20 of these transcripts.
 
-We will set the first 2 transcripts to be overexpressed in group A and the next 2 transcripts to be overexpressed in group B, each at a fold change of 3. The way to do this in Polyester is to provide a "fold change matrix": for each transcript and each group, specify a fold change. Polyester will generate baseline read numbers (assuming no differential expression), and will then multiply those mean numbers by the fold change you specify for the replicates in that group. The fold change matrix for this simple 2-group experiment looks like this:
+We will set the first 2 transcripts to be overexpressed in group A and the next 2 transcripts to be overexpressed in group B, each at a fold change of 4. The way to do this in Polyester is to provide a "fold change matrix": for each transcript and each group, specify a fold change. Polyester will generate baseline read numbers (assuming no differential expression), and will then multiply those mean numbers by the fold change you specify for the replicates in that group. The fold change matrix for this simple 2-group experiment looks like this:
 
 
 ```r
