@@ -1,6 +1,6 @@
 # Important Note
 
-This is a customized polyester repository used for the [ASimulatoR package](https://github.com/biomedbigdata/ASimulatoR).
+This is a customized polyester repository used for the [ASimulatoR package](https://github.com/daisybio/ASimulatoR). Please do not install directly. This is only to be used by [ASimulatoR](https://github.com/daisybio/ASimulatoR).
 
 # Introduction
 
