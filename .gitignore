@@ -11,3 +11,4 @@ vignettes/polyester.html
 *.Rproj*
 .RData
 .Rproj.user
+.aider*
