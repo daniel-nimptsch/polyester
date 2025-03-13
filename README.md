@@ -23,8 +23,9 @@ Start R and run:
 
 
 ```r
-source("http://bioconductor.org/biocLite.R")
-biocLite("polyester")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("polyester")
 ```
 
 # Required Input
@@ -165,24 +166,25 @@ To create a count matrix that resembles a real dataset, use the `create_read_num
 
 
 ```r
-source("http://bioconductor.org/biocLite.R")
-biocLite("ballgown")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ballgown")
 ```
 
 ```r
 library(ballgown)
 data(bg)
 bg = subset(bg, "chr=='22'")
-     
+
 # load gtf file for annotation:
 gtfpath = system.file('extdata', 'bg.gtf.gz', package='polyester')
 gtf = subset(gffRead(gtfpath), seqname=='22')
-     
+
 # load chromosome sequence corresponding to gtf file (just for this example)
 system('wget https://www.dropbox.com/s/04i6msi9vu2snif/chr22seq.rda')
 load('chr22seq.rda')
 names(chr22seq) = '22'
-     
+
 # simulate reads based on this experiment's FPKMs
 simulate_experiment_empirical(bg, grouplabels=pData(bg)$group, gtf=gtf,
     seqpath=chr22seq, mean_rps=5000, outdir='empirical_reads', seed=1247)
