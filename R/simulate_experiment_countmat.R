@@ -41,56 +41,56 @@
 #'   level estimation from biased RNA-Seq reads. Bioinformatics 28(22):
 #'   2914-2921.
 #' @examples \donttest{
-#'   fastapath = system.file("extdata", "chr22.fa", package="polyester")
-#'   numtx = count_transcripts(fastapath)
-#'   readmat = matrix(20, ncol=10, nrow=numtx)
-#'   readmat[1:30, 1:5] = 40
+#' fastapath <- system.file("extdata", "chr22.fa", package = "polyester")
+#' numtx <- count_transcripts(fastapath)
+#' readmat <- matrix(20, ncol = 10, nrow = numtx)
+#' readmat[1:30, 1:5] <- 40
 #'
-#'   simulate_experiment_countmat(fasta=fastapath,
-#'     readmat=readmat, outdir='simulated_reads_2', seed=5)
-#'}
+#' simulate_experiment_countmat(
+#'     fasta = fastapath,
+#'     readmat = readmat, outdir = "simulated_reads_2", seed = 5
+#' )
+#' }
+simulate_experiment_countmat <- function(
+    fasta = NULL, gtf = NULL, seqpath = NULL,
+    readmat, outdir = ".", paired = TRUE, seed = NULL, ncores = 1L, ...) {
+    extras <- list(...)
 
-simulate_experiment_countmat = function(fasta=NULL, gtf=NULL, seqpath=NULL,
-    readmat, outdir='.', paired=TRUE, seed=NULL, ncores = 1L, ...){
+    if (!is.null(seed)) set.seed(seed)
 
-    extras = list(...)
-
-    if(!is.null(seed)) set.seed(seed)
-
-    if(!is.null(fasta) & is.null(gtf) & is.null(seqpath)){
-        transcripts = readDNAStringSet(fasta)
-    }else if(is.null(fasta) & !is.null(gtf) & !is.null(seqpath)){
-        transcripts = seq_gtf(gtf, seqpath, ...)
-    }else{
-        stop('must provide either fasta or both gtf and seqpath')
+    if (!is.null(fasta) & is.null(gtf) & is.null(seqpath)) {
+        transcripts <- readDNAStringSet(fasta)
+    } else if (is.null(fasta) & !is.null(gtf) & !is.null(seqpath)) {
+        transcripts <- seq_gtf(gtf, seqpath, ...)
+    } else {
+        stop("must provide either fasta or both gtf and seqpath")
     }
 
     # If for some reason the names of the transcripts are missing,
     # add dummy transcript names so the user can follow from which
     # transcript each read is generated
     if (is.null(names(transcripts))) {
-      warning(.makepretty('the provided transcripts have missing names;
-              adding dummy names'))
-      num_trans <- length(transcripts)
-      digits <- nchar(num_trans)
-      format <- paste0("%s%0", digits, "d")
-      names(transcripts) <- sprintf(format, "transcript", 1:num_trans)
+        warning(.makepretty("the provided transcripts have missing names;
+              adding dummy names"))
+        num_trans <- length(transcripts)
+        digits <- nchar(num_trans)
+        format <- paste0("%s%0", digits, "d")
+        names(transcripts) <- sprintf(format, "transcript", 1:num_trans)
     }
 
-    stopifnot(class(readmat) == 'matrix')
+    stopifnot("matrix" %in% class(countmat))
     stopifnot(nrow(readmat) == length(transcripts))
 
     # validate extra arguments
-    extras = .check_extras(extras, paired, total.n=ncol(readmat))
+    extras <- .check_extras(extras, paired, total.n = ncol(readmat))
 
-    sysoutdir = gsub(' ', '\\\\ ', outdir)
-    if(.Platform$OS.type == 'windows'){
-        shell(paste('mkdir', sysoutdir))
-    }else{
-        system(paste('mkdir -p', sysoutdir))
+    sysoutdir <- gsub(" ", "\\\\ ", outdir)
+    if (.Platform$OS.type == "windows") {
+        shell(paste("mkdir", sysoutdir))
+    } else {
+        system(paste("mkdir -p", sysoutdir))
     }
 
     # do the sequencing
     sgseq(readmat, transcripts, paired, outdir, extras, ncores = ncores)
-
 }
