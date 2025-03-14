@@ -6,7 +6,7 @@
     if(!('distr' %in% names(extras))){
         extras$distr = 'normal'
     }else{
-        extras$distr = match.arg(extras$distr,
+        extras$distr = match.arg(extras$distr, 
             c('normal', 'empirical', 'custom'))
         if(extras$distr == 'custom' & !('custdens' %in% names(extras))){
             stop(.makepretty('to use custom fragment distribution, provide
