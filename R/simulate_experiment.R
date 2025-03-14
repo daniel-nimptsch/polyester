@@ -287,7 +287,7 @@
 #'   \item \code{verbose}: Should progress messages be printed during the sequencing process?
 #'   Default \code{FALSE}.
 #'   \item \code{seq_depth}: Number of reads to be sequenced per sample. Can be a vector of length one or \code{sum(num_reps)}.
-#'   Readcounts will be multiplied by a factor to be equal to \code{seq_depth}. 
+#'   Readcounts will be multiplied by a factor to be equal to \code{seq_depth}.
 #'   If used with \code{lib_sizes}, \code{seq_depth} will be applied first.
 #'   \item \code{pcr_rate}: Fraction of fragments that will be duplicated. Reads from these fragments will have PCR_DUP in the name.
 #'   Default \code{NULL}
@@ -299,9 +299,9 @@
 #'   Default 'CTGTCTCTTATACACATCT'
 #'   \item only to be called inside the function \code{simulate_alternative_splicing}:
 #'   \itemize{
-#'   \item \code{exon_junction_coverage}: Should the coverage of exons, junctions and retained introns be determined? 
+#'   \item \code{exon_junction_coverage}: Should the coverage of exons, junctions and retained introns be determined?
 #'   If \code{TRUE}, a \code{data.table} must be provided in \code{exon_junction_table}. See \code{exon_junction_table} for details.
-#'   \item \code{exon_junction_table}: \code{data.table} which contains the columns \code{'transcript_id', 'type', 'tr_start', 'tr_end'} 
+#'   \item \code{exon_junction_table}: \code{data.table} which contains the columns \code{'transcript_id', 'type', 'tr_start', 'tr_end'}
 #'   and is used to determie the coverage of exons, junctions and retained introns.
 #'   }
 #'   }
@@ -490,10 +490,6 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL,
         system(paste('mkdir -p', sysoutdir))
     }
 
-    # do the actual sequencing
-    # do the actual sequencing
-    sgseq(readmat, transcripts, paired, outdir, extras, reportCoverage,ncores=ncores)
-
     # write out simulation information, if asked for:
     if(!('write_info' %in% names(extras))){
         write_info=TRUE
@@ -506,6 +502,10 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL,
       .write_info(extras, transcripts, num_reps, fold_changes, outdir,
                   group_ids, counts_matrix)
     }
+
+    # do the actual sequencing
+    # do the actual sequencing
+    # sgseq(readmat, transcripts, paired, outdir, extras, reportCoverage,ncores=ncores)
 
     # Restore whatever RNG the user had set before running this function
     RNGkind(old_rng[1], old_rng[2])
