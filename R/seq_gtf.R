@@ -1,15 +1,15 @@
 #' @title Get transcript sequences from GTF file and sequence info
 #'
-#' @description Given a GTF file (for transcript structure) and DNA sequences, 
+#' @description Given a GTF file (for transcript structure) and DNA sequences,
 #'   return a DNAStringSet of transcript sequences
 #' @param gtf one of path to GTF file, or data frame representing a canonical
 #'   GTF file.
-#' @param seqs one of path to folder containing one FASTA file (\code{.fa} 
+#' @param seqs one of path to folder containing one FASTA file (\code{.fa}
 #'   extension) for each chromosome in \code{gtf}, or named DNAStringSet
-#'   containing one DNAString per chromosome in \code{gtf}, representing its 
+#'   containing one DNAString per chromosome in \code{gtf}, representing its
 #'   sequence. In the latter case, \code{names(seqs)} should contain the
 #'   same entries as the \code{seqnames} (first) column of \code{gtf}.
-#' @param feature one of \code{'transcript'} or \code{'exon'} (default 
+#' @param feature one of \code{'transcript'} or \code{'exon'} (default
 #'   transcript), depending on desired return.
 #' @param exononly if \code{TRUE} (as it is by default), only create transcript
 #'   sequences from the features labeled \code{exon} in \code{gtf}.
@@ -20,11 +20,11 @@
 #'   attributes separated? Default \code{"; "}.
 #' @export
 #' @references \url{http://www.ensembl.org/info/website/upload/gff.html}
-#' @return 
-#'   If feature is \code{'transcript'}, DNAStringSet containing 
+#' @return
+#'   If feature is \code{'transcript'}, DNAStringSet containing
 #'   transcript sequences, with names corresponding to \code{idfield} in
 #'   \code{gtf}. If feature is \code{'exon'}, DNAStringSet containing exon
-#'   sequences from \code{gtf}, named by exon location (chr, start, end, 
+#'   sequences from \code{gtf}, named by exon location (chr, start, end,
 #'   strand).
 #' @examples  \dontrun{
 #'   library(Biostrings)
@@ -33,19 +33,19 @@
 #'   data(gtf_dataframe)
 #'   chr22_processed = seq_gtf(gtf_dataframe, chr22seq)
 #'}
-seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE, 
+seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE,
     idfield='transcript_id', attrsep="; "){
 
     feature = match.arg(feature, c('transcript', 'exon'))
 
-    gtfClasses = c("character", "character", "character", "integer", 
+    gtfClasses = c("character", "character", "character", "integer",
         "integer", "character", "character", "character", "character")
     if(is.character(gtf)){
         # read transcript structure from file:s
-        gtf_dat = read.table(gtf, sep="\t", as.is=TRUE, quote="", header=FALSE, 
+        gtf_dat = read.table(gtf, sep="\t", as.is=TRUE, quote="", header=FALSE,
             comment.char="#", nrows= -1, colClasses=gtfClasses)
     } else if(is.data.frame(gtf)){
-        # do what we can to check whether gtf really does represent a 
+        # do what we can to check whether gtf really does represent a
         # canonical GTF
         stopifnot(ncol(gtf) == 9)
         if(!all(unlist(lapply(gtf, class)) == gtfClasses)){
@@ -67,38 +67,54 @@ seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE,
 
     # makes sure all chromosomes are present:
     chrs = unique(gtf_dat$seqname)
+    possible_exts = c('fa', 'fasta', 'fna', 'fas')
     if(is.character(seqs)){
         fafiles = list.files(seqs)
-        lookingFor = sprintf('%s.fa', chrs)
+        # Check each chromosome has at least one file with allowed extension
+        all_present = sapply(chrs, function(chr) {
+            any(paste0(chr, '.', possible_exts) %in% fafiles)
+        })
+        if(!all(all_present)){
+            missing = chrs[!all_present]
+            stop(sprintf("Missing sequence files for chromosomes: %s. Allowed extensions: %s",
+                        paste(missing, collapse=", "), paste(possible_exts, collapse=", ")))
+        }
     } else {
         fafiles = names(seqs)
-        lookingFor = chrs
+        if(!all(chrs %in% fafiles)){
+            stop("all chromosomes in gtf must have corresponding sequences in seqs")
+        }
     }
-    if(!(all(lookingFor %in% fafiles))){
-        stop("all chromosomes in gtf must have corresponding sequences in seqs")
-    }
-    
+
     seqlist = lapply(chrs, function(chr){
         dftmp = gtf_dat[gtf_dat[,1] == chr,]
         if(is.character(seqs)){
-            fullseq = readDNAStringSet(sprintf('%s/%s.fa', seqs, chr))
+            # Find the correct file for the chromosome
+            chr_files = list.files(seqs, pattern = paste0('^', chr, '\\.(', paste(possible_exts, collapse='|'), ')$'))
+            if(length(chr_files) == 0){
+                stop(sprintf("No sequence file found for chromosome %s with extensions %s", chr, paste(possible_exts, collapse=", ")))
+            }
+            if(length(chr_files) > 1){
+                stop(sprintf("Multiple sequence files found for chromosome %s: %s", chr, paste(chr_files, collapse=", ")))
+            }
+            fullseq = readDNAStringSet(file.path(seqs, chr_files[1]))
         } else {
             fullseq = seqs[which(names(seqs) == chr)]
         }
         if(feature == 'exon'){
             dftmp = dftmp[!duplicated(dftmp[,c(1,4,5,7)]),] #unique exons
         }
-        these_seqs = subseq(rep(fullseq, times=nrow(dftmp)), 
+        these_seqs = subseq(rep(fullseq, times=nrow(dftmp)),
             start=dftmp$start, end=dftmp$end)
         if(feature == 'transcript'){
-            names(these_seqs) = getAttributeField(dftmp$attributes, idfield, 
+            names(these_seqs) = getAttributeField(dftmp$attributes, idfield,
                 attrsep=attrsep)
             if(substr(names(these_seqs)[1],1,1) == '"'){
                 x = names(these_seqs)
                 names(these_seqs) = substr(x, 2, nchar(x)-1)
             }
         }else{
-            names(these_seqs) = paste0(dftmp[,1], ':', dftmp[,4], '-', 
+            names(these_seqs) = paste0(dftmp[,1], ':', dftmp[,4], '-',
                 dftmp[,5], '(', dftmp[,7], ')')
         }
         revstrand = which(dftmp$strand == '-')
@@ -115,4 +131,3 @@ seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE,
         return(DNAStringSet(lapply(split_list, unlist)))
     }
 }
-
